@@ -28,10 +28,10 @@ serverless deploy
 
 ### Invocation
 
-After successful deployment, you can create a new user by calling the corresponding endpoint:
+After successful deployment, you can create a new customer by calling the corresponding endpoint:
 
 ```bash
-curl --request POST 'https://xxxxxx.execute-api.us-east-1.amazonaws.com/dev/customers' --header 'Content-Type: application/json' --data-raw '{"firstName": "John", "lastName": "SomeName", "observations": "SomeObs"}'
+curl --request POST 'https://v3b2slwkhg.execute-api.us-east-1.amazonaws.com/dev/customers' --header 'Content-Type: application/json' --data-raw '{"firstName": "John", "lastName": "SomeName", "observations": "SomeObs"}'
 ```
 
 Which should result in the following response:
@@ -43,7 +43,7 @@ Which should result in the following response:
 You can later retrieve the customer by `customerId` by calling the following endpoint:
 
 ```bash
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/dev/users/customerId
+curl https://v3b2slwkhg.execute-api.us-east-1.amazonaws.com/dev/customerId
 ```
 
 Which should result in the following response:
@@ -52,11 +52,27 @@ Which should result in the following response:
 {"firstName":"someName","lastName":"SomeName","observations":"SomeObs"}
 ```
 
-If you try to retrieve user that does not exist, you should receive the following response:
+If you try to retrieve customer that does not exist, you should receive the following response:
 
 ```bash
 {"error":"Could not find customer with provided \"customerId\""}
 ```
+
+You can delete customer with the following endpoint:
+
+```bash
+curl -X DELETE https://v3b2slwkhg.execute-api.us-east-1.amazonaws.com/dev/customerId
+```
+
+There is no response for this call.
+
+Finally, to update customer, do the following request:
+
+```bash
+curl -X PUT -d 'firstName=SomeName&lastName=someLastName&observations=someObservations'  https://v3b2slwkhg.execute-api.us-east-1.amazonaws.com/dev/customerId
+```
+
+Response is the customer updated object
 
 ### Local development
 

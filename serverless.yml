@@ -1,0 +1,101 @@
+org: bernardi
+app: paga-leve-api
+service: paga-leve-api
+
+frameworkVersion: "2"
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  tableName: "customers-table-${self:provider.stage}"
+  dynamodb:
+    start:
+      migrate: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: "20201221"
+  stage: dev
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [CustomersTable, Arn]
+  environment:
+    CUSTOMERS_TABLE: ${self:custom.tableName}
+
+functions:
+  api:
+    handler: handler.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+  getCustomers:
+    handler: handler.handler
+    events:
+      - http:
+          path: /customers/{proxy+}
+          method: GET
+          cors: true
+  createCustomers:
+    handler: handler.handler
+    events:
+      - http:
+          path: /customers
+          method: POST
+          cors: true
+  listCustomers:
+    handler: handler.handler
+    events:
+      - http:
+          path: /customers
+          method: GET
+          cors: true
+  deleteCustomers:
+    handler: handler.handler
+    events:
+      - http:
+          path: /customers/{proxy+}
+          method: DELETE
+          cors: true
+
+  updateCustomers:
+    handler: handler.handler
+    events:
+      - http:
+          path: /customers/{proxy+}
+          method: PUT
+          cors: true
+
+resources:
+  Resources:
+    CustomersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: customerId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: customerId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
